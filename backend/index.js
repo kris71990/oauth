@@ -7,10 +7,10 @@ const app = express();
 
 require('dotenv').config();
 
-const GOOGLE_OAUTH_URL = 'https://www.googleapis.com/oauth2/v4/token';
-const OPEN_ID_URL = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
+const SPOTIFY_OAUTH_URL = 'https://accounts.spotify.com/api/token';
+const OPEN_ID_URL = 'https://api.spotify.com/v1/me';
 
-app.get('/oauth/google', (request, response) => {
+app.get('/oauth/spotify', (request, response) => {
   console.log('__STEP 3.1__ - receiving code');
   console.log(request.query);
 
@@ -20,14 +20,14 @@ app.get('/oauth/google', (request, response) => {
     console.log('__CODE__', request.query.code);
     console.log('__STEP 3.2__ - sending code back');
 
-    return superagent.post(GOOGLE_OAUTH_URL)
+    return superagent.post(SPOTIFY_OAUTH_URL)
       .type('form')
       .send({
         code: request.query.code,
         grant_type: 'authorization_code',
-        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_id: process.env.SPOTIFY_CLIENT_ID,
         client_secret: process.env.CLIENT_SECRET,
-        redirect_uri: `${process.env.API_URL}/oauth/google`,
+        redirect_uri: `${process.env.API_URL}/oauth/spotify`,
       })
       .then((tokenResponse) => {
         console.log('__STEP 3.3__ - access token');
@@ -52,6 +52,8 @@ app.get('/oauth/google', (request, response) => {
         console.log(error);
         response.redirect(`${process.env.CLIENT_URL}?error=oauth`);
       });
+
+    // create accounts
   }
   return null;
 });
